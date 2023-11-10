@@ -23,3 +23,13 @@ def split_report(report):
 
   return report_as, report_ct, report_ct_as
 
+# Generate three tables
+def generate_relationship_tables(table):
+  reports = {"as-as": "", "ct-ct": "", "ct-as": ""}
+  BASE_PATH = f"../ccf-validation-tools/docs/{table}/"
+  report = pd.read_csv(f"{BASE_PATH}class_{table}_log.tsv", sep='\t')
+  report_as, report_ct, report_ct_as = split_report(table)
+
+  return report_as, report_ct, report_ct_as
+
+table_as, table_ct, table_ct_as = generate_relationship_tables(table)
