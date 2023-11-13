@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 import pandas as pd
 import inquirer
@@ -27,9 +28,38 @@ def split_report(report):
 def generate_relationship_tables(organ_table):
 	BASE_PATH = f"../ccf-validation-tools/docs/{organ_table}/"
 	table = pd.read_csv(f"{BASE_PATH}class_{organ_table}_log.tsv", sep='\t')
-	simplified_table = table[["olabel", "o", "slabel", "s"]]
+	simplified_table = table[["olabel", "o", "slabel", "s"]].drop_duplicates() # We are only interested in the ID and labels. We don't need duplicates.
 	report_as, report_ct, report_ct_as = split_report(simplified_table)
 
 	return report_as, report_ct, report_ct_as
 
 table_as, table_ct, table_ct_as = generate_relationship_tables(organ_table)
+
+# Check if the folder exists for tables and reports
+if not os.path.exists(f"docs/Tables/{organ_table}"):
+    # If it doesn't exist, create the folder
+    os.makedirs(f"docs/Tables/{organ_table}")
+    os.makedirs(f"docs/Reports/{organ_table}")
+    print(f"The folder '{organ_table}' has been created.")
+else:
+    print(f"The folder '{organ_table}' already exists.")
+
+# It would be good to load last version to compare tables and if tables are the same, not write a new document.
+
+date = datetime.today().strftime('%Y-%m-%d')
+
+# Create a Pandas Excel writer using XlsxWriter as the engine
+excel_file_path = f"docs/Tables/{organ_table}/{organ_table}_{date}.xlsx"
+
+# Check if the file already exists
+if os.path.exists(excel_file_path):
+    print(f"The file '{excel_file_path}' already exists. Please choose a different file name.")
+else:
+    # Create a Pandas Excel writer using XlsxWriter as the engine
+    with pd.ExcelWriter(excel_file_path) as writer:
+    # Write each dataframe to a different worksheet
+        table_as.to_excel(writer, sheet_name='Table_AS', index=False)
+        table_ct.to_excel(writer, sheet_name='Table_CT', index=False)
+        table_ct_as.to_excel(writer, sheet_name='Table_CT_AS', index=False)
+
+    print(f"Excel file '{excel_file_path}' has been created.")
