@@ -30,7 +30,21 @@ def generate_relationship_tables(organ_table):
 	table = pd.read_csv(f"{BASE_PATH}class_{organ_table}_log.tsv", sep='\t')
 	simplified_table = table[["olabel", "o", "slabel", "s"]].drop_duplicates() # We are only interested in the ID and labels. We don't need duplicates.
 	report_as, report_ct, report_ct_as = split_report(simplified_table)
+    # List of DataFrames
+	dataframes = [report_as, report_ct, report_ct_as]
 
+    # Apply the method to each DataFrame
+    # Use enumerate to get both index and DataFrame in the loop
+	for idx, df in enumerate(dataframes):
+		# Some reports might be empty, we don't need to do anything on them.
+		if not df.empty:
+			# Reset the index and update the DataFrame in the list
+			dataframes[idx] = df.reset_index(drop=True)
+            # Add the reporting column
+			dataframes[idx]['reporting'] = dataframes[idx].apply(lambda row: f"{row.name + 1}. '{row['olabel']}' --> '{row['slabel']}'", axis=1)
+
+	report_as, report_ct, report_ct_as = dataframes
+    
 	return report_as, report_ct, report_ct_as
 
 table_as, table_ct, table_ct_as = generate_relationship_tables(organ_table)
@@ -51,15 +65,10 @@ date = datetime.today().strftime('%Y-%m-%d')
 # Create a Pandas Excel writer using XlsxWriter as the engine
 excel_file_path = f"docs/Tables/{organ_table}/{organ_table}_{date}.xlsx"
 
-# Check if the file already exists
-if os.path.exists(excel_file_path):
-    print(f"The file '{excel_file_path}' already exists. Please choose a different file name.")
-else:
-    # Create a Pandas Excel writer using XlsxWriter as the engine
-    with pd.ExcelWriter(excel_file_path) as writer:
-    # Write each dataframe to a different worksheet
-        table_as.to_excel(writer, sheet_name='Table_AS', index=False)
-        table_ct.to_excel(writer, sheet_name='Table_CT', index=False)
-        table_ct_as.to_excel(writer, sheet_name='Table_CT_AS', index=False)
+# Create a Pandas Excel writer using XlsxWriter as the engine
+with pd.ExcelWriter(excel_file_path) as writer:
+# Write each dataframe to a different worksheet
+    table_as.to_excel(writer, sheet_name=f"Table_AS_{date}", index=False)
+    table_ct.to_excel(writer, sheet_name=f"Table_CT_{date}", index=False)
+    table_ct_as.to_excel(writer, sheet_name=f"Table_AS-CT_{date}", index=False)
 
-    print(f"Excel file '{excel_file_path}' has been created.")
