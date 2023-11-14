@@ -50,9 +50,9 @@ def generate_relationship_tables(organ_table):
 table_as, table_ct, table_ct_as = generate_relationship_tables(organ_table)
 
 # Check if the folder exists for tables and reports
-if not os.path.exists(f"docs/Tables/{organ_table}"):
+if not os.path.exists(f"docs/Tables.gitignore/{organ_table}"):
     # If it doesn't exist, create the folder
-    os.makedirs(f"docs/Tables/{organ_table}")
+    os.makedirs(f"docs/Tables.gitignore/{organ_table}")
     os.makedirs(f"docs/Reports/{organ_table}")
     print(f"The folder '{organ_table}' has been created.")
 else:
@@ -63,7 +63,7 @@ else:
 date = datetime.today().strftime('%Y-%m-%d')
 
 # Create a Pandas Excel writer using XlsxWriter as the engine
-excel_file_path = f"docs/Tables/{organ_table}/{organ_table}_{date}.xlsx"
+excel_file_path = f"docs/Tables.gitignore/{organ_table}/{organ_table}_{date}.xlsx"
 
 # Create a Pandas Excel writer using XlsxWriter as the engine
 with pd.ExcelWriter(excel_file_path) as writer:
