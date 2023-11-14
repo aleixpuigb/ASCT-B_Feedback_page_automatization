@@ -41,7 +41,7 @@ def generate_relationship_tables(organ_table):
 			# Reset the index and update the DataFrame in the list
 			dataframes[idx] = df.reset_index(drop=True)
             # Add the reporting column
-			dataframes[idx]['reporting'] = dataframes[idx].apply(lambda row: f"**{row.name + 1}. '{row['olabel']}' --> '{row['slabel']}'**", axis=1)
+			dataframes[idx]['reporting'] = dataframes[idx].apply(lambda row: f"**{row.name + 1} - {row['olabel']} &rarr; {row['slabel']}**", axis=1)
 
 	report_as, report_ct, report_ct_as = dataframes
     
